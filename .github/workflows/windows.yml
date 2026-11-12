@@ -26,6 +26,8 @@ env:
 
 jobs:
   windows:
+    # Skip a published release that already carries the Windows zip (attached while it was a draft).
+    if: github.event_name != 'release' || !contains(join(github.event.release.assets.*.name, ','), 'MattCut-windows-x64.zip')
     runs-on: windows-latest
     timeout-minutes: 150
     steps:

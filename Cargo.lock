@@ -3176,7 +3176,7 @@ dependencies = [
 
 [[package]]
 name = "mattcut"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "cpal",
@@ -3201,7 +3201,7 @@ dependencies = [
 
 [[package]]
 name = "mattcut-mcp"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "filmcraft-automation",
  "filmcraft-engine",
@@ -3212,7 +3212,7 @@ dependencies = [
 
 [[package]]
 name = "mattcut-office"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "base64",
  "getrandom 0.3.4",
@@ -3225,7 +3225,7 @@ dependencies = [
 
 [[package]]
 name = "mattcut-server"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "argon2",
  "chrono",

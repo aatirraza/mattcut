@@ -17,6 +17,7 @@ mod office_link;
 mod preview;
 mod thumbs;
 mod ui;
+mod update;
 
 /// Exports composite on the GPU where they can (FilmCraft's off-screen compositor), falling back
 /// to the CPU renderer.

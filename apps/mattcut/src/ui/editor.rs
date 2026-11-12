@@ -192,6 +192,7 @@ fn top_bar(app: &mut MattCut, ui: &mut egui::Ui) {
                         app.export = Some(super::export::ExportDialog::new(app));
                     }
                     ui.add_space(6.0);
+                    home::update_button(app, ui);
                     if !crate::config::STANDALONE {
                         home::account_menu(app, ui);
                         let (dot, tip) = home::status_tip(app);

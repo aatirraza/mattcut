@@ -96,6 +96,12 @@ pub struct MattCut {
     pub export: Option<export::ExportDialog>,
     pub toasts: Vec<Toast>,
     pub show_shortcuts: bool,
+    /// The background update check (gone once it answered).
+    update_rx: Option<Receiver<crate::update::Available>>,
+    /// A newer release, once found: the top bars show an Update button.
+    pub update: Option<crate::update::Available>,
+    /// Show the "MattCut X is available" dialog.
+    pub update_dialog: bool,
     control: Option<(Receiver<ControlRequest>, ControlInfo)>,
     last_local_save: Instant,
     last_upload: Instant,
@@ -150,6 +156,9 @@ impl MattCut {
             export: None,
             toasts: Vec::new(),
             show_shortcuts: false,
+            update_rx: Some(crate::update::check_in_background(cc.egui_ctx.clone())),
+            update: None,
+            update_dialog: false,
             control,
             last_local_save: Instant::now(),
             last_upload: Instant::now(),
@@ -826,6 +835,62 @@ impl MattCut {
         ctx.send_viewport_cmd(egui::ViewportCommand::Title(title));
     }
 
+    /// "MattCut X is available": shown once per launch when the check finds a newer release, and
+    /// again from the top bar's Update button. A required update can't be dismissed.
+    fn update_ui(&mut self, ctx: &egui::Context) {
+        if let Some(rx) = &self.update_rx
+            && let Ok(found) = rx.try_recv()
+        {
+            self.update_rx = None;
+            self.update = Some(found);
+            self.update_dialog = true;
+        }
+        if !self.update_dialog {
+            return;
+        }
+        let Some(up) = self.update.clone() else { return };
+        let modal = egui::Modal::new(egui::Id::unique("update-available")).show(ctx, |ui| {
+            ui.set_width(460.0);
+            ui.heading(format!("MattCut {} is available", up.version));
+            ui.label(egui::RichText::new(format!("You have version {}.", crate::update::CURRENT)).color(theme::TEXT_DIM));
+            if up.required {
+                ui.add_space(4.0);
+                ui.label(egui::RichText::new("This update is required. Install it to keep using MattCut.").color(theme::WARN));
+            }
+            if !up.notes.is_empty() {
+                ui.add_space(10.0);
+                ui.label(egui::RichText::new("What's new").small().color(theme::TEXT_DIM));
+                egui::Frame::new().fill(theme::PANEL_2).corner_radius(8).inner_margin(10).show(ui, |ui| {
+                    ui.set_width(ui.available_width());
+                    egui::ScrollArea::vertical().max_height(220.0).show(ui, |ui| ui.label(&up.notes));
+                });
+            }
+            ui.add_space(8.0);
+            ui.label(
+                egui::RichText::new("Update now opens the download page. Install the new version over the old one; your projects stay as they are.")
+                    .small()
+                    .color(theme::TEXT_FAINT),
+            );
+            ui.add_space(10.0);
+            ui.horizontal(|ui| {
+                if ui.add(theme::primary("Update now")).clicked() {
+                    if let Err(e) = mattcut_office::open_browser(crate::update::DOWNLOAD_PAGE) {
+                        self.error(format!("Couldn't open the browser ({e}). Go to {}", crate::update::DOWNLOAD_PAGE));
+                    }
+                    if !up.required {
+                        self.update_dialog = false;
+                    }
+                }
+                if !up.required && ui.button("Later").clicked() {
+                    self.update_dialog = false;
+                }
+            });
+        });
+        if !up.required && modal.should_close() {
+            self.update_dialog = false;
+        }
+    }
+
     fn lock_overlay(&mut self, ctx: &egui::Context) {
         if self.screen == Screen::Connect || self.office.licensed() {
             return;
@@ -916,6 +981,7 @@ impl eframe::App for MattCut {
             editor::shortcuts_window(self, &ctx);
         }
         self.lock_overlay(&ctx);
+        self.update_ui(&ctx);
         self.toasts_ui(&ctx);
     }
 

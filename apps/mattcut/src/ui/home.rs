@@ -318,6 +318,16 @@ pub fn account_menu(app: &mut MattCut, ui: &mut egui::Ui) {
     });
 }
 
+/// "Update to X" in the top bars once the update check found a newer release.
+pub fn update_button(app: &mut MattCut, ui: &mut egui::Ui) {
+    let Some(v) = app.update.as_ref().map(|u| u.version.clone()) else { return };
+    let btn = egui::Button::new(RichText::new(format!("Update to {v}")).size(12.5).color(Color32::WHITE)).fill(theme::ACCENT).corner_radius(6);
+    if ui.add(btn).on_hover_text("A new version of MattCut is available").clicked() {
+        app.update_dialog = true;
+    }
+    ui.add_space(6.0);
+}
+
 fn top_bar(app: &mut MattCut, ui: &mut egui::Ui) {
     egui::Panel::top("home-top")
         .exact_size(60.0)
@@ -327,6 +337,7 @@ fn top_bar(app: &mut MattCut, ui: &mut egui::Ui) {
             ui.horizontal_centered(|ui| {
                 logo(app, ui, 28.0);
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    update_button(app, ui);
                     if crate::config::STANDALONE {
                         return;
                     }
