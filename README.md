@@ -5,8 +5,8 @@ of media/text/effects/transitions/filters/captions, one-click export) for Mac an
 entirely on your own computer: no account, no server, no internet needed. Claude can drive it over
 MCP.
 
-**Download:** see the download page (deployed from `site/` on Vercel) or this repo's
-[Releases](https://github.com/aatirraza/mattcut/releases).
+**Download:** [mattcut-site.vercel.app](https://mattcut-site.vercel.app/) (deployed from `site/`
+on Vercel) or this repo's [Releases](https://github.com/aatirraza/mattcut/releases).
 
 It is built on the [FilmCraft](https://github.com/storytold/filmcraft) engine (MIT OR Apache-2.0):
 its own H.264 / HEVC / ProRes / AAC codecs, GPU compositor, exact frame timing, colour grading,
@@ -52,7 +52,7 @@ versions, and an app that locks when it can't reach the server. See
 3. Create a GitHub Release and attach the `.dmg`. **Keep the file name `MattCut-mac-universal.dmg`**:
    the download button links to `releases/latest/download/MattCut-mac-universal.dmg`.
 4. Update the version shown in `site/index.html`; pushing to `main` redeploys the page on Vercel
-   (`vercel.json` serves `site/` with no build step).
+   (the Vercel project's Root Directory is `site/`, preset Other, no build step).
 
 ## Editing
 
