@@ -1,0 +1,3 @@
+# Share the engine build cache (../mattcraft): the engine, codecs and GPU crates are compiled once for both.
+[build]
+target-dir = "../mattcraft/target"

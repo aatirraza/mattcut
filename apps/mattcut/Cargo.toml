@@ -1,0 +1,41 @@
+[package]
+name = "mattcut"
+description = "MattCut — the office video editor (desktop app)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+default-run = "mattcut"
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# Auto captions (speech to text with Whisper on the CPU; the model downloads on first use).
+auto-captions = ["filmcraft-engine/whisper", "filmcraft-engine/speech-download"]
+# Natural text-to-speech voices (Kokoro on the CPU; downloads on first use).
+natural-voices = ["filmcraft-engine/neural-voices"]
+# Team mode: sign in to a MattCut office server (shared projects, edit locks, licence lease).
+# Without it MattCut is standalone: no sign-in, no server, projects saved on this computer.
+team = []
+
+[dependencies]
+mattcut-office = { workspace = true }
+filmcraft-engine = { workspace = true }
+filmcraft-project = { workspace = true }
+filmcraft-render = { workspace = true }
+filmcraft-time = { workspace = true }
+filmcraft-export = { workspace = true }
+filmcraft-gpu = { workspace = true }
+filmcraft-platform = { workspace = true }
+filmcraft-audio-dsp = { path = "../../../mattcraft/crates/audio-dsp" }
+filmcraft-media = { path = "../../../mattcraft/crates/media" }
+egui = { workspace = true }
+eframe = { workspace = true }
+rfd = { workspace = true }
+image = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+chrono = { workspace = true }
+cpal = "0.16"

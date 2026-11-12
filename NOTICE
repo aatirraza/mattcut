@@ -1,0 +1,6 @@
+MattCut
+Licensed under the MIT license or the Apache License 2.0, at your option.
+
+MattCut is built on FilmCraft (https://github.com/storytold/filmcraft) by the ArtCraft team,
+licensed MIT OR Apache-2.0. The FilmCraft source, its NOTICE and ATTRIBUTION.md are in
+../mattcraft. FilmCraft's own third-party credits apply to MattCut builds as well.

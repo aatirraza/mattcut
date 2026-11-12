@@ -1,0 +1,16 @@
+[package]
+name = "mattcut-mcp"
+description = "MCP server that connects Claude (or any MCP client) to MattCut"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+mattcut-office = { workspace = true }
+filmcraft-automation = { workspace = true }
+filmcraft-engine = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }

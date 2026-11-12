@@ -1,0 +1,5 @@
+/target
+.DS_Store
+*.fcproj.lock
+/dist
+/package-lock.json
