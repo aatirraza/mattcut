@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Download MattCut</title>
-<meta name="description" content="MattCut, the Mattrics video editor, for Mac (Apple Silicon and Intel).">
+<meta name="description" content="MattCut, the Mattrics video editor, for Mac and Windows.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="logo.png">
 <style>
@@ -40,11 +40,8 @@
   .btn.secondary { background: var(--panel-2); color: var(--dim); cursor: default; }
   .meta { color: var(--faint); font-size: 14px; }
 
-  .notice {
-    display: none; margin: 18px 0 0; padding: 12px 16px; border-radius: 10px;
-    background: var(--accent-soft); color: var(--text); font-size: 15px;
-  }
-  .is-windows .notice { display: block; }
+  .downloads { display: flex; flex-direction: column; }
+  .is-windows .downloads .download:last-child { order: -1; }
 
   section { margin-top: 56px; }
   h2 { font-size: 20px; letter-spacing: -0.01em; margin: 0 0 16px; }
@@ -96,6 +93,7 @@
   <h1>The Mattrics video editor</h1>
   <p class="lede">Timeline editing, text, effects, transitions, filters and captions, with one-click export. Runs fully on your own computer, no account or internet needed.</p>
 
+  <div class="downloads">
   <div class="download">
     <a class="btn" id="mac-download" href="https://github.com/aatirraza/mattcut/releases/latest/download/MattCut-mac-universal.dmg">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.3-3.51ZM14.2 6.14c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22Z"/></svg>
@@ -104,9 +102,13 @@
     <span class="meta">Version 0.1.0 · Apple Silicon &amp; Intel · macOS 11 or later</span>
   </div>
   <div class="download">
-    <span class="btn secondary" aria-disabled="true">Windows: coming soon</span>
+    <a class="btn" id="win-download" href="https://github.com/aatirraza/mattcut/releases/latest/download/MattCut-windows-x64.zip">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.1 10.4 4v7.1H3V5.1Zm0 13.8 7.4 1.1v-7H3v5.9Zm8.3 1.2L21 21.5v-8.4h-9.7v7Zm0-16.2v7.2H21V2.5l-9.7 1.4Z"/></svg>
+      Download for Windows
+    </a>
+    <span class="meta">Version 0.1.0 · Windows 10 or 11, 64-bit</span>
   </div>
-  <p class="notice">You're on Windows. The Windows version isn't ready yet. Ask in the team chat and we'll let you know when it is.</p>
+  </div>
 
   <section>
     <h2>Install on Mac</h2>
@@ -125,12 +127,21 @@
   </section>
 
   <section>
+    <h2>Install on Windows</h2>
+    <ol class="steps">
+      <li><strong>Unzip the download</strong><p>Right-click <code>MattCut-windows-x64.zip</code> in Downloads and choose <strong>Extract All</strong>. Move the <code>MattCut</code> folder somewhere permanent, such as Documents.</p></li>
+      <li><strong>Open MattCut.exe</strong><p>Double-click <code>MattCut.exe</code> in that folder. Right-click it and choose <strong>Show more options › Send to › Desktop</strong> for a shortcut.</p></li>
+      <li><strong>Allow it the first time</strong><p>If Windows shows <strong>"Windows protected your PC"</strong>, click <strong>More info</strong>, then <strong>Run anyway</strong>. This early build isn't signed with a certificate yet. You only do this once.</p></li>
+    </ol>
+  </section>
+
+  <section>
     <h2>Good to know</h2>
     <dl class="facts">
-      <dt>Your projects</dt><dd>Saved on your Mac in <code>Movies › MattCut Projects</code>.</dd>
+      <dt>Your projects</dt><dd>Saved in <code>Movies › MattCut Projects</code> on Mac, <code>Videos › MattCut Projects</code> on Windows.</dd>
       <dt>Sharing</dt><dd>Send the project's <code>.fcproj</code> file together with its footage, or keep both on the shared drive.</dd>
-      <dt>Exports</dt><dd>Saved in <code>Movies › MattCut Exports</code> unless you pick another folder.</dd>
-      <dt>Updating</dt><dd>Download again from this page and replace the app in Applications. Your projects aren't touched.</dd>
+      <dt>Exports</dt><dd>Saved in <code>MattCut Exports</code> next to your projects folder, unless you pick another folder.</dd>
+      <dt>Updating</dt><dd>Download again from this page and replace the old app (Applications on Mac, the MattCut folder on Windows). Your projects aren't touched.</dd>
     </dl>
   </section>
 

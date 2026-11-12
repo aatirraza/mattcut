@@ -49,8 +49,11 @@ versions, and an app that locks when it can't reach the server. See
 1. Bump `version` in `Cargo.toml`.
 2. Mac: run `packaging/macos/package.sh` (on a Mac). It builds Apple Silicon + Intel and writes
    `dist/MattCut-mac-universal.dmg` (ad-hoc signed; see the script for proper signing).
-3. Create a GitHub Release and attach the `.dmg`. **Keep the file name `MattCut-mac-universal.dmg`**:
-   the download button links to `releases/latest/download/MattCut-mac-universal.dmg`.
+3. Create a GitHub Release (tag `vX.Y.Z`) and attach the `.dmg`. **Keep the file name
+   `MattCut-mac-universal.dmg`**: the download button links to
+   `releases/latest/download/MattCut-mac-universal.dmg`.
+   Publishing the release starts the **Windows build** (`.github/workflows/windows.yml`, about
+   20–40 minutes), which attaches `MattCut-windows-x64.zip` to the same release.
 4. Update the version shown in `site/index.html`; pushing to `main` redeploys the page on Vercel
    (the Vercel project's Root Directory is `site/`, preset Other, no build step).
 
