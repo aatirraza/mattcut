@@ -6,6 +6,9 @@
 //! mattcut --control PORT        first port to try for the local MCP control channel (default 9877)
 //! ```
 
+// A windowed app on Windows (no console window next to it) in release builds.
+#![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
+
 mod audio;
 mod config;
 mod control;

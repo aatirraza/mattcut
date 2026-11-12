@@ -1,0 +1,94 @@
+name: Windows build
+
+# Builds MattCut for Windows (x64) and attaches MattCut-windows-x64.zip to a GitHub Release.
+#
+# - Publishing a release builds it and attaches the zip to that release.
+# - Actions tab > "Windows build" > Run workflow: builds the latest commit. Enter a release tag
+#   (e.g. v0.1.0) to attach the zip to that release; leave it empty to only keep it as a build
+#   artifact (downloadable from the run page for 14 days).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the zip to (empty: build only)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+# The FilmCraft engine version MattCut builds against (github.com/storytold/filmcraft).
+env:
+  ENGINE_REF: c9be14245a6c9da585ff906a6e0ca9c8200652ea
+  CARGO_TERM_COLOR: always
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      # Same layout as on a developer machine: mattcut/ next to the engine checkout mattcraft/
+      # (Cargo path dependencies and the shared target dir point at ../mattcraft).
+      - name: Check out MattCut
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: mattcut
+
+      - name: Check out the FilmCraft engine
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: storytold/filmcraft
+          ref: ${{ env.ENGINE_REF }}
+          path: mattcraft
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache the Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: mattcut -> ../mattcraft/target
+          key: engine-${{ env.ENGINE_REF }}
+
+      - name: Build
+        working-directory: mattcut
+        run: cargo build --release --locked -p mattcut
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path mattcut/Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+          $stage = Join-Path $env:RUNNER_TEMP 'MattCut'
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item mattcraft/target/release/mattcut.exe (Join-Path $stage 'MattCut.exe')
+          @"
+          MattCut $version for Windows (64-bit)
+
+          1. Move this MattCut folder somewhere permanent, e.g. Documents or C:\Program Files.
+          2. Double-click MattCut.exe.
+          3. The first time, Windows may show "Windows protected your PC" because this build is
+             not signed yet: click "More info", then "Run anyway".
+
+          Projects are saved in Videos\MattCut Projects, exports in Videos\MattCut Exports.
+          "@ | Set-Content -Encoding utf8 (Join-Path $stage 'README.txt')
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive -Path $stage -DestinationPath dist/MattCut-windows-x64.zip -Force
+          Get-Item dist/MattCut-windows-x64.zip | Format-List Name, Length
+          (Get-FileHash dist/MattCut-windows-x64.zip -Algorithm SHA256).Hash
+
+      - name: Keep as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MattCut-windows-x64
+          path: dist/MattCut-windows-x64.zip
+          retention-days: 14
+
+      - name: Attach to the release
+        if: github.event_name == 'release' || inputs.tag != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+        run: gh release upload "$env:TAG" dist/MattCut-windows-x64.zip --clobber --repo "${{ github.repository }}"
