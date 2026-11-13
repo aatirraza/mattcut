@@ -39,3 +39,8 @@ serde_json = { workspace = true }
 log = { workspace = true }
 chrono = { workspace = true }
 cpal = "0.16"
+# Isolate voice: the separation network runs with tract (pure-Rust ONNX), the STFT with realfft.
+tract-onnx = "=0.23.10"
+realfft = "3.5"
+filmcraft-codecs = { path = "../../../mattcraft/crates/codecs" }
+filmcraft-speech = { path = "../../../mattcraft/crates/speech", features = ["download"] }
