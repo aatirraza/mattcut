@@ -23,11 +23,13 @@ pub struct TimelineState {
     pub scroll: f32,
     pub fit_next: bool,
     drag: Option<Drag>,
+    /// What the open right-click menu belongs to.
+    menu: Option<super::clip_menu::Target>,
 }
 
 impl Default for TimelineState {
     fn default() -> Self {
-        Self { pps: 60.0, scroll: 0.0, fit_next: true, drag: None }
+        Self { pps: 60.0, scroll: 0.0, fit_next: true, drag: None, menu: None }
     }
 }
 
@@ -141,6 +143,19 @@ pub fn show(app: &mut MattCut, ui: &mut egui::Ui) {
                 }
             }
             paint_clip(&clip_painter, r, c, row, selection.contains(&c.id), faded, kind.as_deref(), &tiles);
+            if !c.enabled {
+                // deactivated: dimmed and hatched, still selectable
+                clip_painter.rect_filled(r, CornerRadius::same(6), Color32::from_black_alpha(150));
+                let hatch = clip_painter.with_clip_rect(r.intersect(clip_painter.clip_rect()));
+                let mut x = r.min.x - r.height();
+                while x < r.max.x {
+                    hatch.line_segment([pos2(x, r.max.y), pos2(x + r.height(), r.min.y)], Stroke::new(1.0, Color32::from_white_alpha(18)));
+                    x += 10.0;
+                }
+                if r.width() > 60.0 {
+                    clip_painter.text(r.right_top() + vec2(-6.0, 4.0), Align2::RIGHT_TOP, "Off", FontId::proportional(10.5), theme::TEXT_DIM);
+                }
+            }
         }
     }
 
@@ -266,6 +281,24 @@ pub fn show(app: &mut MattCut, ui: &mut egui::Ui) {
             }
             Hit::Nothing => {}
         }
+    }
+    // right-click: select what's under the pointer (keeping a selection it's part of), then the menu
+    if resp.secondary_clicked()
+        && let Some(p) = resp.interact_pointer_pos()
+    {
+        app.tl.menu = match hit(&view, &rows, p, full, &x_of) {
+            Hit::Clip { clip, row, .. } => {
+                if !selection.contains(&clip.id) {
+                    app.run("timeline.select", json!({"clips": [clip.id]}));
+                }
+                rows.get(row).map(|r| super::clip_menu::Target::Clip { kind: r.kind, clip })
+            }
+            Hit::Empty { .. } => Some(super::clip_menu::Target::Empty),
+            Hit::Ruler | Hit::Nothing => None,
+        };
+    }
+    if let Some(target) = app.tl.menu.clone() {
+        resp.context_menu(|ui| super::clip_menu::show(app, ui, &target));
     }
     if resp.double_clicked()
         && let Some(p) = resp.interact_pointer_pos()

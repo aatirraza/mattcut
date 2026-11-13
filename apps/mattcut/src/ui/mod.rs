@@ -4,12 +4,14 @@ pub mod theme;
 
 mod icons;
 
+mod clip_menu;
 mod editor;
 mod export;
 mod home;
 mod inspector;
 mod library;
 mod timeline;
+mod voice;
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;

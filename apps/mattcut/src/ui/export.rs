@@ -27,6 +27,8 @@ pub struct ExportDialog {
     quality: usize,
     job: Option<u64>,
     done: Option<Result<PathBuf, String>>,
+    /// Export only this span of the timeline (ticks), e.g. the selected clips.
+    range: Option<(i64, i64)>,
 }
 
 const QUALITY: [(&str, f64); 3] = [("Recommended", 1.0), ("Higher", 1.8), ("Smaller file", 0.55)];
@@ -35,7 +37,15 @@ impl ExportDialog {
     pub fn new(app: &MattCut) -> Self {
         let name = app.doc.as_ref().map_or_else(|| "MattCut export".into(), |d| d.name.clone());
         let fps = app.view.as_ref().map_or(30.0, |v| (v.fps * 1000.0).round() / 1000.0);
-        Self { name, dir: app.cfg.export_dir.clone(), res: 0, fps, format: 0, quality: 0, job: None, done: None }
+        Self { name, dir: app.cfg.export_dir.clone(), res: 0, fps, format: 0, quality: 0, job: None, done: None, range: None }
+    }
+
+    /// Export just `start..end` of the timeline ("Export selected clips").
+    pub fn for_range(app: &MattCut, start: i64, end: i64) -> Self {
+        let mut d = Self::new(app);
+        d.name = format!("{} (clip)", d.name);
+        d.range = Some((start, end));
+        d
     }
 }
 
@@ -68,7 +78,14 @@ pub fn show(app: &mut MattCut, ctx: &egui::Context, d: &mut ExportDialog) -> boo
     }
     egui::Modal::new(egui::Id::unique("export")).show(ctx, |ui| {
         ui.set_width(460.0);
-        ui.heading("Export");
+        ui.heading(if d.range.is_some() { "Export selected clips" } else { "Export" });
+        if let Some((a, b)) = d.range {
+            ui.label(
+                RichText::new(format!("{} to {} ({})", crate::model::short_duration(a), crate::model::short_duration(b), crate::model::short_duration(b - a)))
+                    .small()
+                    .color(theme::TEXT_DIM),
+            );
+        }
         ui.add_space(8.0);
         if let Some(done) = &d.done {
             match done {
@@ -184,6 +201,11 @@ fn start(app: &mut MattCut, d: &mut ExportDialog) {
     }
     let path = d.dir.join(format!("{}.{ext}", d.name.trim()));
     let mut params = json!({"path": path.to_string_lossy(), "format": fmt, "wait": false});
+    if let Some((a, b)) = d.range {
+        params["range"] = json!("custom");
+        params["startSeconds"] = json!(crate::model::secs(a));
+        params["endSeconds"] = json!(crate::model::secs(b));
+    }
     if d.format < 4 {
         let (w, h) = size_for(app, d.res);
         params["width"] = json!(w);

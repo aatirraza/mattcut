@@ -436,6 +436,17 @@ pub fn jump_edit(app: &mut MattCut, forward: bool) {
     }
 }
 
+/// ⌥⌘X: detach the sound of the selected video clips.
+fn extract_selected_audio(app: &mut MattCut) {
+    let Some(view) = app.view.clone() else { return };
+    let sel = app.selection();
+    for v in view.video.iter().flat_map(|t| t.clips.iter()).filter(|c| sel.contains(&c.id)) {
+        if let Some(a) = v.link.and_then(|l| view.audio.iter().flat_map(|t| t.clips.iter()).find(|c| c.link == Some(l))) {
+            super::clip_menu::extract_audio(app, v, a);
+        }
+    }
+}
+
 fn keyboard(app: &mut MattCut, ctx: &egui::Context) {
     if ctx.egui_wants_keyboard_input() || !app.office.licensed() {
         return;
@@ -465,6 +476,29 @@ fn keyboard(app: &mut MattCut, ctx: &egui::Context) {
     if pressed(cmd, Key::Z) {
         app.stop_playback();
         app.run("edit.undo", json!({}));
+    }
+    // clip menu shortcuts (Alt / Shift combinations before the plain ones they extend)
+    let alt = Modifiers::ALT;
+    if pressed(cmd | alt, Key::C) {
+        super::clip_menu::copy_attributes(app);
+    }
+    if pressed(cmd | alt, Key::V) {
+        super::clip_menu::paste_attributes(app);
+    }
+    if pressed(cmd | alt, Key::X) {
+        extract_selected_audio(app);
+    }
+    if pressed(alt, Key::G) {
+        super::clip_menu::compound(app);
+    }
+    if pressed(cmd | shift, Key::G) {
+        app.run("clip.ungroup", json!({}));
+    }
+    if pressed(cmd, Key::G) && app.selection().len() > 1 {
+        app.run("clip.group", json!({}));
+    }
+    if pressed(none, Key::V) {
+        super::clip_menu::toggle_enabled(app);
     }
     if pressed(cmd, Key::C) {
         app.run("edit.copy", json!({}));

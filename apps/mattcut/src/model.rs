@@ -32,6 +32,8 @@ pub struct ClipView {
     pub speed: f64,
     pub reverse: bool,
     pub link: Option<u64>,
+    /// Off ("Deactivate clip"): kept on the timeline but not seen or heard.
+    pub enabled: bool,
     pub effects: Vec<Value>,
     pub is_graphic: bool,
 }
@@ -127,6 +129,7 @@ impl SeqView {
                                                 speed: c.get("speed").and_then(Value::as_f64).unwrap_or(1.0),
                                                 reverse: c.get("reverse").and_then(Value::as_bool).unwrap_or(false),
                                                 link: c.get("link").and_then(Value::as_u64),
+                                                enabled: c.get("enabled").and_then(Value::as_bool).unwrap_or(true),
                                                 effects: c.get("effects").and_then(Value::as_array).cloned().unwrap_or_default(),
                                                 is_graphic: c.get("graphic").is_some()
                                                     || c.get("name").and_then(Value::as_str).is_some_and(|n| n.ends_with(" Text") || n == "Graphic"),
